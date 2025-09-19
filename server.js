@@ -333,8 +333,6 @@ app.post('/api/start', (req, res) => {
   const { id, dir, template } = generateTempTemplate();
   const args = buildArgsForChoice(choice, format_id, template);
   args.push(url);
-
-  const child = await spawnYtDlp(args, { cwd: dir });
   resolveYtDlp().then(({ command, prefix }) => {
     const child = spawn(command, [...prefix, ...args], { cwd: dir, shell: false });
     const state = { id, dir, template, filePath: null, percent: 0, status: 'running', error: null, cmd: [command, ...prefix] };
