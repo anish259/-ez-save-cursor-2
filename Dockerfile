@@ -9,9 +9,11 @@ ENV NODE_VERSION=18
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
+    ca-certificates \
     python3 \
     python3-pip \
     ffmpeg \
+    && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Install yt-dlp

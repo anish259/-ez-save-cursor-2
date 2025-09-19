@@ -64,7 +64,8 @@ app.get('/api/info', async (req, res) => {
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: 'Missing url' });
   try {
-    const { stdout } = await runYtDlpCollect(['-J', '--no-warnings', url]);
+    const args = ['-J', '--no-warnings', '--no-cache-dir', '--socket-timeout', '30', url];
+    const { stdout } = await runYtDlpCollect(args);
     const info = JSON.parse(stdout);
     // Normalize common fields for frontend convenience
     const normalized = {
@@ -86,6 +87,8 @@ app.get('/api/info', async (req, res) => {
     };
     res.json(normalized);
   } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('INFO_ERROR', { url, error: String(err?.message || err) });
     res.status(500).json({ error: 'Failed to fetch info', details: String(err.message || err) });
   }
 });
@@ -162,6 +165,8 @@ app.get('/api/download', async (req, res) => {
     });
     const filePath = findActualFile(dir, id);
     if (!filePath) {
+      // eslint-disable-next-line no-console
+      console.error('DL_NO_FILE', { id, dir, template });
       return res.status(500).json({ error: 'Download finished but file not found' });
     }
 
@@ -177,6 +182,8 @@ app.get('/api/download', async (req, res) => {
     });
     stream.pipe(res);
   } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('DL_ERROR', { url, choice, format_id, error: String(err?.message || err) });
     res.status(500).json({ error: 'Download failed', details: String(err.message || err) });
   }
 });
